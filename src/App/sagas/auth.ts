@@ -1,12 +1,15 @@
 import { SagaIterator } from 'redux-saga';
 import { call, put, takeEvery } from 'redux-saga/effects';
 import { authLogin, userRegister, getProducts, getStocks, getUsers } from '../api/auth';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 import {
   USER_LOGIN,
+  USER_GOOGLE_LOGIN,
   USER_LOGIN_COMPLETED,
   USER_LOGIN_ERROR,
   USER_LOGIN_REQUEST,
+  USER_GOOGLE_LOGIN_REQUEST,
   USER_REGISTER,
   USER_REGISTER_COMPLETED,
   USER_REGISTER_ERROR,
@@ -21,6 +24,7 @@ import {
   GET_USERS_REQUEST,
   GET_USERS_FAILURE,
 } from '../actions';
+
 export function* userLoginAsync(action: { payload: { email: string; password: string; }; }):SagaIterator {
   yield put({ type: USER_LOGIN_REQUEST });
   try {
@@ -33,6 +37,32 @@ export function* userLoginAsync(action: { payload: { email: string; password: st
   } catch (error: any) {
     console.error("Saga Login Error:", error.message);
     yield put({ type: USER_LOGIN_ERROR, payload: error.message });
+  }
+}
+
+export function* userGoogleLoginAsync(): SagaIterator {
+  yield put({ type: USER_GOOGLE_LOGIN_REQUEST });
+  try {
+    yield call([GoogleSignin, 'hasPlayServices']);
+    const userInfo = yield call([GoogleSignin, 'signIn']);
+    console.log("Google User Info:", userInfo);
+    // Here you would typically send userInfo.idToken to your backend
+    // Since we don't have a backend endpoint for this, we'll simulate success
+    // Or if the backend has one, we'd call it.
+    
+    // For now, let's treat the google user as the logged in user
+    yield put({ type: USER_LOGIN_COMPLETED, payload: { user: userInfo.user, token: userInfo.idToken } });
+  } catch (error: any) {
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      yield put({ type: USER_LOGIN_ERROR, payload: 'Google sign-in cancelled' });
+    } else if (error.code === statusCodes.IN_PROGRESS) {
+      yield put({ type: USER_LOGIN_ERROR, payload: 'Google sign-in already in progress' });
+    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      yield put({ type: USER_LOGIN_ERROR, payload: 'Play services not available' });
+    } else {
+      yield put({ type: USER_LOGIN_ERROR, payload: error.message });
+    }
+    console.error("Saga Google Login Error:", error);
   }
 }
 export function* userRegisterAsync(action: { payload: { email: string; password: string; firstName: string; lastName: string; }; }): SagaIterator {
@@ -79,6 +109,7 @@ export function* watchGetProducts() {
 
 export function* userLogin() {
   yield takeEvery(USER_LOGIN as any, userLoginAsync);
+  yield takeEvery(USER_GOOGLE_LOGIN as any, userGoogleLoginAsync);
 }
 
 export function* watchUserRegister() {

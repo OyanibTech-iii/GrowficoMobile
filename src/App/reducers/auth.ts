@@ -1,8 +1,10 @@
 import {
   USER_LOGIN,
+  USER_GOOGLE_LOGIN,
   USER_LOGIN_COMPLETED,
   USER_LOGIN_ERROR,
   USER_LOGIN_REQUEST,
+  USER_GOOGLE_LOGIN_REQUEST,
   USER_LOGOUT,
   LOGIN_RESET,
   USER_LOGIN_RESET,
@@ -73,6 +75,7 @@ export default function reducer(state = INITIAL_STATE, action: any) {
       return { ...state, usersLoading: false, usersError: action.payload };
 
     case USER_LOGIN_REQUEST:
+    case USER_GOOGLE_LOGIN_REQUEST:
       return {
         ...state,
         data: null,
@@ -146,6 +149,10 @@ export default function reducer(state = INITIAL_STATE, action: any) {
 export const userLogin = (payload: any) => ({
   type: USER_LOGIN,
   payload,
+});
+
+export const userGoogleLogin = () => ({
+  type: USER_GOOGLE_LOGIN,
 });
 
 
