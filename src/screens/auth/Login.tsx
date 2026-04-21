@@ -11,7 +11,7 @@ import CustomModal from '../../components/CustomModal';
 import { IMG, ROUTES } from '../../utils';
 import { AuthContext } from '../../utils/AuthContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { userLogin, resetLogin } from '../../App/reducers/auth';
+import { userLogin, userGoogleLogin, resetLogin } from '../../App/reducers/auth';
 
 const Login = () => {
   // --- STATE ---
@@ -163,7 +163,7 @@ const Login = () => {
         label={'Login'}
         containerStyle={{
           justifyContent: 'center',
-          marginVertical: 20,
+          marginVertical: 10,
           width: '80%',
           backgroundColor: '#47bf24',
           borderRadius: 10,
@@ -184,6 +184,31 @@ const Login = () => {
               password,
             }),
           );
+        }}
+      />
+
+      <CustomButton
+        label={'Sign in with Google'}
+        containerStyle={{
+          justifyContent: 'center',
+          marginVertical: 5,
+          width: '80%',
+          backgroundColor: '#ffffff',
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: '#ddd',
+        }}
+        textStyle={{
+          color: '#000000',
+          textAlign: 'center',
+          fontSize: 16,
+          fontFamily: 'Poppins-Medium',
+        }}
+        loading={isLoading}
+        onPress={() => {
+          console.log("Attempting Google login");
+          didSubmitRef.current = true;
+          dispatch(userGoogleLogin());
         }}
       />
 

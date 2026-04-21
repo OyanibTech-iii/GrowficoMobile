@@ -19,17 +19,26 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const { width } = Dimensions.get('window');
 
   return (
-    <View style={containerStyle}>
-      <TouchableOpacity onPress={loading ? undefined : onPress} disabled={loading}>
-        <View style={{ padding: width * 0.014, borderRadius: 10, backgroundColor: '#16a34a' }}>
-          {loading ? (
-            <ActivityIndicator color="#ffffff" size="small" />
-          ) : (
-            <Text style={textStyle}>{label}</Text>
-          )}
-        </View>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity 
+      onPress={loading ? undefined : onPress} 
+      disabled={loading}
+      style={[
+        { 
+          paddingVertical: width * 0.02, 
+          borderRadius: 10, 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          backgroundColor: '#16a34a' 
+        }, 
+        containerStyle as ViewStyle
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={textStyle && (textStyle as any).color ? (textStyle as any).color : "#ffffff"} size="small" />
+      ) : (
+        <Text style={textStyle}>{label}</Text>
+      )}
+    </TouchableOpacity>
   );
 };
 
