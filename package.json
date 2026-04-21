@@ -1,5 +1,5 @@
 {
-  "name": "APPDEVSectionB",
+  "name": "APPDEV_B_SY25226",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,14 +10,24 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.0.1",
+    "@react-native-community/checkbox": "^0.5.20",
     "@react-native/new-app-screen": "0.83.1",
+    "@react-navigation/bottom-tabs": "^7.14.0",
     "@react-navigation/native": "^7.1.28",
-    "@react-navigation/stack": "^7.7.1",
+    "@react-navigation/stack": "^7.7.2",
     "react": "19.2.0",
     "react-native": "0.83.1",
+    "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "^2.30.0",
+    "react-native-modal": "^14.0.0-rc.1",
     "react-native-safe-area-context": "^5.6.2",
-    "react-native-screens": "^4.20.0"
+    "react-native-screens": "^4.23.0",
+    "react-native-vector-icons": "^10.3.0",
+    "react-redux": "^9.2.0",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
+    "redux-saga": "^1.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

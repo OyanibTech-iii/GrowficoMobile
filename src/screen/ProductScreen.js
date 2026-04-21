@@ -1,23 +1,44 @@
-import React, { useState } from 'react';
-import { View, Image, FlatList, Text, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Image, FlatList, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSelector } from 'react-redux';
+
 import { IMG } from '../utils';
+import { useAuth } from '../utils/AuthContext';
 import CustomFooter from '../components/CustomFooter';
+import { getProducts } from '../App/api/auth';
 
 const { width } = Dimensions.get('window');
 
 const ProductScreen = () => {
+    const authData = useSelector(state => state.auth.data);
+    
+    const { user } = useAuth(); 
+    
     const tabBarHeight = useBottomTabBarHeight();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const [products, setProducts] = useState([
-        { id: '1', title: 'Product 1', price: '$10.00' },
-        { id: '2', title: 'Product 2', price: '$20.00' },
-        { id: '3', title: 'Product 3', price: '$30.00' },
-        { id: '4', title: 'Product 4', price: '$40.00' },
-        { id: '5', title: 'Product 5', price: '$50.00' },
-        { id: '6', title: 'Product 6', price: '$60.00' },
-    ]);
+    useEffect(() => {
+        const token = authData?.token || user?.token;
+
+        if (token) {
+            setLoading(true);
+            getProducts(token)
+                .then((res) => {
+                    setProducts(res);
+                })
+                .catch((err) => {
+                    console.error('Fetch error:', err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            setLoading(false);
+        }
+    }, [authData?.token, user?.token]); 
 
     const renderProductItem = ({ item }) => (
         <View style={{
@@ -39,10 +60,10 @@ const ProductScreen = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Image 
-                    source={IMG.LOGO} 
-                    style={{ width: '80%', height: '80%' }} 
-                    resizeMode="contain" 
+                <Image
+                    source={IMG.LOGO}
+                    style={{ width: '80%', height: '80%' }}
+                    resizeMode="contain"
                 />
             </View>
             <View style={{ padding: 12 }}>
@@ -68,34 +89,40 @@ const ProductScreen = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
-            <FlatList
-                data={products}
-                renderItem={renderProductItem}
-                keyExtractor={(item) => item.id}
-                numColumns={2}
-                contentContainerStyle={{
-                    paddingHorizontal: 10,
-                    paddingTop: 20,
-                    paddingBottom: tabBarHeight + 20
-                }}
-                ListHeaderComponent={() => (
-                    <View style={{ marginBottom: 10, paddingHorizontal: 10 }}>
-                        <Text style={{
-                            fontSize: 18,
-                            fontWeight: 'bold',
-                            color: '#0f3a03',
-                            fontFamily: 'Poppins-Bold'
-                        }}>
-                            Our Products
-                        </Text>
-                    </View>
-                )}
-                ListFooterComponent={() => (
-                    <View style={{ marginTop: 30, marginBottom: 20, alignItems: 'center' }}>
-                        <CustomFooter />
-                    </View>
-                )}
-            />
+            {loading ? (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color="#48bf24" />
+                </View>
+            ) : (
+                <FlatList
+                    data={products}
+                    renderItem={renderProductItem}
+                    keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+                    numColumns={2}
+                    contentContainerStyle={{
+                        paddingHorizontal: 10,
+                        paddingTop: 20,
+                        paddingBottom: tabBarHeight + 20
+                    }}
+                    ListHeaderComponent={() => (
+                        <View style={{ marginBottom: 10, paddingHorizontal: 10 }}>
+                            <Text style={{
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                color: '#0f3a03',
+                                fontFamily: 'Poppins-Bold'
+                            }}>
+                                Our Products
+                            </Text>
+                        </View>
+                    )}
+                    ListFooterComponent={() => (
+                        <View style={{ marginTop: 30, marginBottom: 20, alignItems: 'center' }}>
+                            <CustomFooter />
+                        </View>
+                    )}
+                />
+            )}
         </SafeAreaView>
     );
 };
